@@ -63,8 +63,7 @@ class GPTCodeInterpreter(BaseCodeInterpreter):
         ), "The openai_api_key.txt file could not be found. Please make sure it is in the same directory as this script, and that it contains your OpenAI API key."
 
         # load from key file
-        with open("./openai_api_key.txt") as f:
-            OPENAI_API_KEY = f.read()
+        OPENAI_API_KEY = Path("./openai_api_key.txt").read_text()
         openai.api_key = OPENAI_API_KEY
 
         self.nb = JupyterNotebook()
@@ -72,9 +71,8 @@ class GPTCodeInterpreter(BaseCodeInterpreter):
     def get_response_content(self):
         if self.response:
             return self.response["choices"][0]["message"]["content"]
-        else:
-            self.logger.warning("Response is empty.")
-            return None
+        self.logger.warning("Response is empty.")
+        return None
 
     @retry(
         stop_max_attempt_number=7,
@@ -97,9 +95,7 @@ class GPTCodeInterpreter(BaseCodeInterpreter):
         img_data = None
 
         if VERBOSE:
-            print(
-                "###User : " + Fore.BLUE + Style.BRIGHT + user_message + Style.RESET_ALL
-            )
+            print(f"###User : {Fore.BLUE}{Style.BRIGHT}{user_message}{Style.RESET_ALL}")
             print("\n###Assistant : ")
         while True:
             if attempt > 3:
